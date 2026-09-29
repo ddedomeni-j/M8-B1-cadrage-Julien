@@ -1,13 +1,39 @@
-# Schéma d'architecture cible — _ton cas_ (À COMPLÉTER)
-
-> Mini-cours `05`. Renomme en `schema_archi_cible.md`. ≥ 4 composants, flux de
-> données, où se trouvent les traitements de tes risques 🔴 (revue humaine,
-> pseudonymisation, journalisation).
+# Schéma d'architecture cible
 
 ```mermaid
-flowchart LR
-    %% TODO — sources → traitement → modèle → sortie → utilisateur
-```
+flowchart TD
+    SRC[(Décisions autorisées<br/>sur le serveur du cabinet)]
+    SEL[Sélection des sources<br/>autorisées]
+    NORM[Normalisation<br/>métadonnées et contrôle qualité]
 
-**Composants** : _…_
-**Ce qu'on n'a PAS mis** (et pourquoi) : _…_
+    USER[Avocat authentifié]
+    QUERY[Question de l'avocat]
+    REVIEW[Revue et validation<br/>de l'avocat]
+    LOG[(Journal des accès<br/>et recherches)]
+
+    subgraph SEARCH_SYSTEM["1. Recherche documentaire RAG - hébergée en France"]
+        CHUNK[Découpage des documents<br/>en passages]
+        IDX[(Base documentaire<br/>indexée)]
+        RETRIEVE[Recherche et récupération<br/>des passages pertinents]
+        SOURCED[Première sortie:<br/>résultats sourcés et références]
+    end
+
+    subgraph GENERATION["2. Génération assistée - facultative"]
+        CHECK{Références<br/>disponibles ?}
+        LLM[LLM: proposition de réponse<br/>fondée sur les passages]
+        NORESULT[Absence de proposition]
+    end
+
+    SRC --> SEL --> NORM --> CHUNK --> IDX
+    USER --> QUERY --> RETRIEVE
+    RETRIEVE --> IDX
+    IDX --> RETRIEVE
+    RETRIEVE --> SOURCED
+    SOURCED --> REVIEW
+    SOURCED --> CHECK
+    CHECK -->|Oui| LLM --> REVIEW
+    CHECK -->|Non| NORESULT
+    REVIEW -->|Décision validée| SRC
+    QUERY --> LOG
+    REVIEW --> LOG
+```
