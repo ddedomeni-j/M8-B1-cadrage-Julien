@@ -10,8 +10,9 @@ flowchart TD
     QUERY[Question de l'avocat]
     REVIEW[Revue et validation<br/>de l'avocat]
     LOG[(Journal des accès<br/>et recherches)]
+    HOST[Hébergeur français infogéré<br/>sauvegardes, mises à jour, supervision]
 
-    subgraph SEARCH_SYSTEM["1. Recherche documentaire RAG - hébergée en France"]
+    subgraph SEARCH_SYSTEM["1. Recherche documentaire RAG - hébergée et infogérée en France"]
         CHUNK[Découpage des documents<br/>en passages]
         IDX[(Base documentaire<br/>indexée)]
         RETRIEVE[Recherche et récupération<br/>des passages pertinents]
@@ -36,4 +37,7 @@ flowchart TD
     REVIEW -->|Décision validée| SRC
     QUERY --> LOG
     REVIEW --> LOG
+
+    HOST -. administre .-> IDX
+    HOST -. administre .-> LOG
 ```
