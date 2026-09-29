@@ -62,6 +62,7 @@ Besoin reformulé :
 | Fuite d’informations couvertes par le secret professionnel | 🔴 | Responsabilité déontologique du cabinet | Hébergement français contractualisé, chiffrement, authentification et droits d’accès |
 | Jurisprudence inventée, inexacte ou non pertinente | 🔴 | Responsabilité professionnelle de l’avocat | Source et document d’origine affichés; absence de réponse sans source fiable; revue par l’avocat |
 | Accès à un dossier par une personne non autorisée | 🔴 | Confidentialité, secret professionnel, RGPD | Accès par rôle, principe du moindre privilège et journalisation |
+| Indisponibilité ou défaut de sécurité du serveur après le 31 décembre | 🔴 | Fin du contrat du prestataire actuel | Hébergement infogéré en France, sauvegardes, supervision et responsabilités définies par contrat |
 | Courrier obsolète réutilisé | 🟠 | Dossier de modèles non maintenu depuis 2019 | Courriers exclus de la V1; validation et versionnage avant intégration |
 | Indexation non autorisée de la base juridique externe | 🟠 | Respect de la licence de la base | Vérifier les droits d’usage avant toute indexation |
 | Réponse prise pour un avis juridique définitif | 🟡 | Risque de mauvaise interprétation | Message d’avertissement et validation humaine obligatoire |
@@ -70,8 +71,7 @@ Besoin reformulé :
 
 | Menace | Plausibilité sur ce cas | Mitigation proposée | Risque résiduel |
 |---|---|---|---|
-| Fuite de documents par un utilisateur ou un hébergeur | 🔴: corpus couvert par le secret professionnel | Hébergement français, chiffrement, authentification, accès par rôle et journaux | Erreur de paramétrage ou utilisateur interne malveillant |
-| Injection indirecte dans un document indexé | 🟠 si une IA générative est utilisée | Séparer les instructions de l’outil du contenu documentaire; filtrer les documents; aucun droit d’écriture | Réponse dégradée, sans action automatique |
+| Fuite de documents par un utilisateur ou un hébergeur | 🔴 : corpus couvert par le secret professionnel | Hébergement français infogéré, chiffrement, authentification, accès par rôle et journaux | Erreur de paramétrage ou utilisateur interne malveillant | 🟠 si une IA générative est utilisée | Séparer les instructions de l’outil du contenu documentaire; filtrer les documents; aucun droit d’écriture | Réponse dégradée, sans action automatique |
 | Extraction par appels massifs | 🟡: outil réservé au cabinet | Accès authentifié, limitation et surveillance des requêtes | Utilisateur interne abusif |
 | Empoisonnement des données | 🟡: pas de réentraînement prévu | Validation humaine des documents avant indexation | Document erroné validé à tort |
 
@@ -79,11 +79,14 @@ Les attaques adversariales sur des entrées et le réentraînement empoisonné s
 
 ## 5. Architecture cible et sobriété
 
-Le schéma de [schema_archi_cible.md](schema_archi_cible.md) distingue deux niveaux. Le premier est une recherche documentaire RAG: seules les décisions autorisées sont sélectionnées, normalisées, découpées en passages puis indexées dans une base hébergée en France. L’avocat authentifié obtient une première sortie composée des passages retrouvés, de leurs références et du document source. Les accès et recherches sont journalisés.
+Le schéma de [schema_archi_cible.md](schema_archi_cible.md) distingue deux niveaux. Le premier est une recherche documentaire RAG: seules les décisions autorisées sont sélectionnées, normalisées, découpées en passages puis indexées dans une base hébergée en France et administrée par un prestataire avec sauvegardes, mises à jour de sécurité et supervision contractuellement définies. L’avocat authentifié obtient une première sortie composée des passages retrouvés, de leurs références et du document source. Les accès et recherches sont journalisés.
 
-Le second niveau, facultatif, ajoute un modèle de langage. Il rédige une proposition à partir de la question de l’avocat et des passages déjà retrouvés. Il ne produit aucune réponse lorsqu’aucune référence n’est disponible. Dans les deux cas, l’avocat relit et valide la décision avant toute utilisation professionnelle. Les décisions validées peuvent enrichir le corpus après contrôle humain explicite, sans ajout automatique.
+Le second niveau, facultatif, ajoute un modèle de langage. Il rédige une proposGPT-5.6 Terra • 24.2 credits
+ition à partir de la question de l’avocat et des passages déjà retrouvés. Il ne produit aucune réponse lorsqu’aucune référence n’est disponible. Dans les deux cas, l’avocat relit et valide la décision avant toute utilisation professionnelle. Les décisions validées peuvent enrichir le corpus après contrôle humain explicite, sans ajout automatique.
 
 Le choix d’un LLM est donc limité à la reformulation d’informations déjà sourcées; il n’est pas nécessaire pour la première sortie de recherche. Cette approche réduit le risque d’invention de jurisprudence et permet une V1 utile même sans génération. La V1 exclut les courriers, dont les modèles sont obsolètes, ainsi que la base juridique externe tant que les droits d’indexation ne sont pas confirmés. Aucun agent avec droit d’écriture ni réentraînement automatique n’est prévu.
+
+La continuité de service après le 31 décembre impose de confier l’exploitation technique à un hébergeur français infogéré ou au futur prestataire informatique. La responsabilité des sauvegardes, mises à jour et incidents doit être définie avant le pilote.
 
 ## 6. Indicateurs, seuils, questions ouvertes
 
